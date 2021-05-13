@@ -3,7 +3,7 @@ pdfXBlock
 
 ### Description ###
 
-This XBlock provides an easy way to embed a PDF.
+This XBlock provides an easy way to embed a PDF. Modified by EOL-TEAM.
 
 ### File Upload Configuration
 
@@ -21,7 +21,7 @@ PDF_STORAGE_CLASS = {
 PDF_STORAGE_CLASS = ENV_TOKENS.get('PDF_STORAGE_CLASS', PDF_STORAGE_CLASS)
 ```
 
-Fileupload max size: 40mb (customizable)
+Fileupload max size: 100mb (customizable)
 
 ### Activate the XBlock in your course ###
 Go to `Settings -> Advanced Settings` and set `advanced_modules` to `["pdf"]`.
@@ -30,32 +30,24 @@ Go to `Settings -> Advanced Settings` and set `advanced_modules` to `["pdf"]`.
 Select `Advanced -> PDF` in your unit.
 
 
-### Working with Translations ###
-
-For information about working with translations, see the [Internationalization Support](http://edx.readthedocs.io/projects/xblock-tutorial/en/latest/edx_platform/edx_lms.html#internationalization-support) section of the [Open edX XBlock Tutorial](https://xblock-tutorial.readthedocs.io/en/latest/).
-
-#### Working with Transifex ####
+### XBlock translations ###
 Prepare your environment:
 
 ```
-$ mkvirtualenv pdf-xblock
-$ make requirements
+docker run -it --rm -w /code -v $(pwd):/code python:3.5 bash
+make requirements
+apt-get update
+apt-get install gettext
 ```
 
-Also ensure that the [Transifex client has the proper authentication](https://docs.transifex.com/client/init) 
-in the `~/.transifexrc` file.
-
-Push new strings to Transifex:
+Extract strings to be translated, outputting .po files
 ```
-$ make push_translations
+make extract_translations
 ```
 
-To get the latest translations from Transifex:
-```
-$ make pull_translations
-```
+Use text.po from `/en/` as the base file and make the translations.
 
-For testing purposes it's faster to avoid Transifex and work on dummy Esperanto translations:
+Compile translation files, outputting .mo files for each supported language.
 ```
-$ make build_dummy_translations
-``` 
+make pull_translations
+```
