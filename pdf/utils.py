@@ -26,7 +26,7 @@ def get_file_storage_path(locator, file_hash, original_filename):
     """
     return (
         six.u(
-            '{loc.org}/{loc.course}/{loc.block_type}/{loc.block_id}/{file_hash}{ext}'
+            '{loc.block_type}/{loc.block_id}/{file_hash}{ext}'
         ).format(
             loc=locator,
             file_hash=file_hash,

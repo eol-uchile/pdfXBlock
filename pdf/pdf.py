@@ -37,7 +37,7 @@ class PDFXBlock(XBlock):
     """
 
     loader = ResourceLoader(__name__)
-    PDF_FILEUPLOAD_MAX_SIZE = 40 * 1000 * 1000  # 40 MB
+    PDF_FILEUPLOAD_MAX_SIZE = 100 * 1000 * 1000  # 100 MB
 
     # Icon of the XBlock. Values : [other (default), video, problem]
 
