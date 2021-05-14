@@ -120,11 +120,12 @@ class PDFXBlock(XBlock):
             'url': self.get_live_url(),
         }
         html = self.render_template('pdf_view.html', context)
-
         frag = Fragment(html)
         frag.add_css(self.load_resource('static/css/pdf.css'))
         frag.add_javascript(self.load_resource('static/js/pdf_view.js'))
         frag.initialize_js('pdfXBlockInitView')
+
+        self.runtime.publish(self, 'completion', {'completion': 1.0}) # Set xblock completed
         return frag
 
     def studio_view(self, context=None):

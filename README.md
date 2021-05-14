@@ -1,6 +1,8 @@
 pdfXBlock
 =========
 
+![https://github.com/eol-uchile/pdfXBlock/actions](https://github.com/eol-uchile/pdfXBlock/workflows/Python%20application/badge.svg)
+
 ### Description ###
 
 This XBlock provides an easy way to embed a PDF. Modified by EOL-TEAM.
@@ -51,3 +53,9 @@ Compile translation files, outputting .mo files for each supported language.
 ```
 make pull_translations
 ```
+
+### TESTS
+**Prepare tests:**
+
+    > cd .github/
+    > docker-compose run --rm lms /openedx/requirements/pdfXBlock/.github/test.sh
