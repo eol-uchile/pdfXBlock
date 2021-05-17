@@ -23,6 +23,12 @@ PDF_STORAGE_CLASS = {
 PDF_STORAGE_CLASS = ENV_TOKENS.get('PDF_STORAGE_CLASS', PDF_STORAGE_CLASS)
 ```
 
+`LMS` & `CMS` .yml:
+
+```
+  X_FRAME_OPTIONS: SAMEORIGIN
+```
+
 Fileupload max size: 100mb (customizable)
 
 ### Activate the XBlock in your course ###
