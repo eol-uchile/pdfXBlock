@@ -6,24 +6,34 @@ function pdfXBlockInitEdit(runtime, element) {
     });
 
     $(element).find('.action-save').bind('click', function() {
-        var data = {
-            'display_name': $('#pdf_edit_display_name').val(),
-            'url': $('#pdf_edit_url').val(),
-            'allow_download': $('#pdf_edit_allow_download').val(),
-            'source_text': $('#pdf_edit_source_text').val(),
-            'source_url': $('#pdf_edit_source_url').val()
-        };
+        var form_data = new FormData();
+        form_data.append('display_name', $('#pdf_edit_display_name').val());
+        form_data.append('pdf_file', $(element).find('#pdf_file').prop('files')[0]);
         
         runtime.notify('save', {state: 'start'});
         
         var handlerUrl = runtime.handlerUrl(element, 'save_pdf');
-        $.post(handlerUrl, JSON.stringify(data)).done(function(response) {
-            if (response.result === 'success') {
-                runtime.notify('save', {state: 'end'});
-                // Reload the whole page :
-                // window.location.reload(false);
-            } else {
-                runtime.notify('error', {msg: response.message})
+        $.ajax({
+            url: handlerUrl,
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: "POST",
+            success: function(response) {
+                if (response.errors.length > 0) {
+                    response.errors.forEach(function(error) {
+                        runtime.notify("error", {
+                            "message": error,
+                            "title": "PDF component save error"
+                        });
+                    });
+                } else {
+                    runtime.notify('save', {
+                        state: 'end'
+                    });
+                }
             }
         });
     });

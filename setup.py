@@ -22,7 +22,7 @@ def package_data(pkg, roots):
 
 setup(
     name='pdf-xblock',
-    version='0.3.1',
+    version='eol.0.4.0',
     description='This XBlock provides an easy way to embed a PDF.',
     packages=[
         'pdf',
@@ -33,6 +33,12 @@ setup(
     entry_points={
         'xblock.v1': [
             'pdf = pdf.pdf:PDFXBlock',
+        ],
+        "lms.djangoapp": [
+            "pdf = pdf.apps:PdfXBlockConfig",
+        ],
+        "cms.djangoapp": [
+            "pdf = pdf.apps:PdfXBlockConfig",
         ]
     },
     package_data=package_data("pdf", ["static", "translations"]),
