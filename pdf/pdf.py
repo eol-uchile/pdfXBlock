@@ -124,7 +124,7 @@ class PDFXBlock(XBlock):
         context = {
             'display_name': self.display_name,
             'is_downloadable': self.is_downloadable,
-            'url': 'https://eol-ing.uchile.cl/pdf/pdf/8c93ee467da5457dbe097ab1ab408da0/abfbb65232767ab040fcf6541f2d579ca6e68a9c.pdf',#self.get_live_url(),
+            'url': self.get_live_url(),
         }
         html = self.render_template('pdf_view.html', context)
         frag = Fragment(html)
