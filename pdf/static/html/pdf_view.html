@@ -3,15 +3,25 @@
     <h2>{{ display_name }}</h2>
     {% if url == '' %}
         <p>{% trans "You have to upload a pdf file first." %}</p>
-
     {% else %}
-        <object data="{{ url }}" type="application/pdf" width="100%" height="600">
-            <p>
-                {% trans "It appears you don't have a PDF plugin for this browser." %}
-            </p>
-        </object>
-        <li class="pdf-download-button">
-            <a href="{{ url }}" download>{% trans "Download the PDF" %}</a>
-        </li>
+        {% if is_downloadable %}
+            <object data="{{ url }}" type="application/pdf" width="100%" height="600">
+                <p>
+                    {% trans "It appears you don't have a PDF plugin for this browser." %}
+                </p>
+            </object>
+            <li class="pdf-download-button">
+                <a href="{{ url }}" download>{% trans "Download the PDF" %}</a>
+            </li>
+        {% else %}
+            <div class="wrapper">
+                <object data="{{ url }}#toolbar=0" type="application/pdf" width="100%" height="600">
+                    <p>
+                        {% trans "It appears you don't have a PDF plugin for this browser." %}
+                    </p>
+                </object>
+                <div class="embed-cover"></div>
+            </div>
+        {% endif %}
     {% endif %}
 </div>
