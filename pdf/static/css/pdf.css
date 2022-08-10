@@ -19,3 +19,20 @@
     background-color: #009FE6;
     color: #FFF;
 }
+.pdf_block .embed-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    
+    /* Just for demonstration, remove this part */
+    opacity: 0.25;
+    width: calc(100% - 17px);
+  }
+  
+.pdf_block .wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+  

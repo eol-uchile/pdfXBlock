@@ -9,7 +9,7 @@ import pkg_resources
 from django.template import Context
 
 from xblock.core import XBlock
-from xblock.fields import Scope, String
+from xblock.fields import Scope, String, Boolean
 from xblock.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblock.exceptions import JsonHandlerError
@@ -62,6 +62,12 @@ class PDFXBlock(XBlock):
 
     pdf_file_name = String(
         scope=Scope.settings
+    )
+    is_downloadable = Boolean(
+        display_name=_("Permitir descargar PDF"),
+        default=True,
+        scope=Scope.settings,
+        help=_("Desactiva todas las opciones de descargas.")
     )
 
     @classmethod
@@ -117,7 +123,8 @@ class PDFXBlock(XBlock):
         """
         context = {
             'display_name': self.display_name,
-            'url': self.get_live_url(),
+            'is_downloadable': self.is_downloadable,
+            'url': 'https://eol-ing.uchile.cl/pdf/pdf/8c93ee467da5457dbe097ab1ab408da0/abfbb65232767ab040fcf6541f2d579ca6e68a9c.pdf',#self.get_live_url(),
         }
         html = self.render_template('pdf_view.html', context)
         frag = Fragment(html)
@@ -136,6 +143,7 @@ class PDFXBlock(XBlock):
 
         context = {
             'display_name': self.display_name,
+            'is_downloadable': self.is_downloadable,
             'pdf_file_name': self.pdf_file_name,
         }
         html = self.render_template('pdf_edit.html', context)
@@ -151,6 +159,7 @@ class PDFXBlock(XBlock):
         The saving handler.
         """
         self.display_name = request.params['display_name']
+        self.is_downloadable = request.params['is_downloadable']
         response = {"result": "success", "errors": []}
         if not hasattr(request.params["pdf_file"], "file"):
             # File not uploaded
