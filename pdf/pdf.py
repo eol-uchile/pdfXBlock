@@ -159,7 +159,7 @@ class PDFXBlock(XBlock):
         The saving handler.
         """
         self.display_name = request.params['display_name']
-        self.is_downloadable = request.params['is_downloadable']
+        self.is_downloadable = request.params['is_downloadable'] if hasattr(request.params,'is_downloadable') else True
         response = {"result": "success", "errors": []}
         if not hasattr(request.params["pdf_file"], "file"):
             # File not uploaded
@@ -186,4 +186,4 @@ class PDFXBlock(XBlock):
             json.dumps(response), content_type="application/json", charset="utf8"
         )
 
-    
+
