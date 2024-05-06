@@ -11,13 +11,14 @@
     line-height: 14px;
     float: left;
     border-radius: 3px;
-    background-color: #FFF;
     padding: 15px;
-    color: #646464;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
 }
 .pdf-download-button a:hover, a:focus {
-    background-color: #009FE6;
-    color: #FFF;
+    background-color: var(--primary-color-hover) !important;
+    border-color: var(--primary-color-hover) !important;
 }
 .pdf_block .embed-cover {
     position: absolute;
