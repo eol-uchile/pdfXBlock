@@ -4,24 +4,10 @@
     {% if url == '' %}
         <p>{% trans "You have to upload a pdf file first." %}</p>
     {% else %}
-        {% if is_downloadable %}
-            <object data="{{ url }}" type="application/pdf" width="100%" height="600">
-                <p>
-                    {% trans "It appears you don't have a PDF plugin for this browser." %}
-                </p>
-            </object>
-            <li class="pdf-download-button">
-                <a href="{{ url }}" download>{% trans "Download the PDF" %}</a>
-            </li>
-        {% else %}
-            <div class="wrapper">
-                <object data="{{ url }}#toolbar=0" type="application/pdf" width="100%" height="600">
-                    <p>
-                        {% trans "It appears you don't have a PDF plugin for this browser." %}
-                    </p>
-                </object>
-                <div class="embed-cover"></div>
-            </div>
-        {% endif %}
+        <object data="{{ url }}" type="application/pdf" width="100%" height="600" class="d-none d-lg-inline">
+        </object>
+        <span class="pdf-download-button button">
+          <a href="{{ url }}" download>{% trans "Download the PDF" %}</a>
+        </span>
     {% endif %}
 </div>
