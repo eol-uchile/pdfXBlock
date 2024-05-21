@@ -9,9 +9,6 @@ function pdfXBlockInitEdit(runtime, element) {
         var form_data = new FormData();
         form_data.append('display_name', $('#pdf_edit_display_name').val());
         form_data.append('pdf_file', $(element).find('#pdf_file').prop('files')[0]);
-        var is_downloadable = $(element).find('#is_downloadable').val();
-        is_downloadable = is_downloadable == '1';
-        form_data.append('is_downloadable', is_downloadable);
         runtime.notify('save', {state: 'start'});
         
         var handlerUrl = runtime.handlerUrl(element, 'save_pdf');

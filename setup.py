@@ -28,8 +28,13 @@ setup(
         'pdf',
     ],
     install_requires=[
-        'XBlock',
+        'XBlock'
     ],
+    extras_require={
+        ":python_version>='3'": [
+            "pikepdf==4.5.0"
+        ]
+    },
     entry_points={
         'xblock.v1': [
             'pdf = pdf.pdf:PDFXBlock',
