@@ -6,6 +6,8 @@
 import os
 import json
 import pkg_resources
+import pikepdf
+import io
 from django.template import Context
 
 from xblock.core import XBlock
@@ -18,7 +20,7 @@ from webob import Response
 from django.urls import reverse
 from django.conf import settings
 from django.core.files import File
-from .utils import get_file_storage_path, get_sha1, get_storage
+from .utils import get_file_storage_path, get_sha1, get_storage, linearize_pdf
 
 import logging
 logger = logging.getLogger(__name__)
@@ -63,12 +65,6 @@ class PDFXBlock(XBlock):
     pdf_file_name = String(
         scope=Scope.settings
     )
-    is_downloadable = Boolean(
-        display_name=_("Permitir descargar PDF"),
-        default=True,
-        scope=Scope.settings,
-        help=_("Desactiva todas las opciones de descargas.")
-    )
 
     @classmethod
     def upload_max_size(self):
@@ -86,8 +82,7 @@ class PDFXBlock(XBlock):
         """
         checks if file size is under limit.
         """
-        file_obj.seek(0, os.SEEK_END)
-        return file_obj.tell() > self.upload_max_size()
+        return file_obj.size > self.upload_max_size()
 
     def get_live_url(self):
         """
@@ -123,7 +118,7 @@ class PDFXBlock(XBlock):
         """
         context = {
             'display_name': self.display_name,
-            'is_downloadable': self.is_downloadable,
+            'pdf_file_name': self.pdf_file_name,
             'url': self.get_live_url(),
         }
         html = self.render_template('pdf_view.html', context)
@@ -143,7 +138,6 @@ class PDFXBlock(XBlock):
 
         context = {
             'display_name': self.display_name,
-            'is_downloadable': self.is_downloadable,
             'pdf_file_name': self.pdf_file_name,
         }
         html = self.render_template('pdf_edit.html', context)
@@ -159,7 +153,6 @@ class PDFXBlock(XBlock):
         The saving handler.
         """
         self.display_name = request.params['display_name']
-        self.is_downloadable = request.params['is_downloadable'] if hasattr(request.params,'is_downloadable') else True
         response = {"result": "success", "errors": []}
         if not hasattr(request.params["pdf_file"], "file"):
             # File not uploaded
@@ -177,11 +170,12 @@ class PDFXBlock(XBlock):
         
         path = get_file_storage_path(self.location, sha1, pdf_file.file.name)
         storage = get_storage()
-        storage.save(path, File(pdf_file.file))
-
-        logger.info("Saving file: %s at path: %s", pdf_file.file.name, path)
+        # Linearize the PDF and save it to storage
+        linearized_pdf_content = linearize_pdf(File(pdf_file.file))
         self.pdf_file_path = path
         self.pdf_file_name = pdf_file.file.name
+        storage.save(path, File(io.BytesIO(linearized_pdf_content)))
+        logger.info("Saving file: %s at path: %s", pdf_file.file.name, path)
         return Response(
             json.dumps(response), content_type="application/json", charset="utf8"
         )

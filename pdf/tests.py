@@ -4,11 +4,18 @@ import unittest
 
 from ddt import ddt
 import mock
+import sys
 from xblock.field_data import DictFieldData
 
 from .pdf import PDFXBlock
-from .utils import get_file_storage_path
-
+from .utils import get_file_storage_path, linearize_pdf
+from django.test.utils import override_settings
+from xblock.django.request import DjangoUploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import pdf
+from pikepdf import Pdf
+import io
+from django.core.files.storage import default_storage
 
 @ddt
 class PDFXBlockTests(unittest.TestCase):
@@ -29,7 +36,7 @@ class PDFXBlockTests(unittest.TestCase):
             Validate that xblock is created successfully
         """
         block = self.make_one()
-        self.assertEqual(block.display_name, 'PDF')
+        self.assertEqual(block.display_name, "PDF")
         self.assertEqual(block.pdf_file_path, None)
         self.assertEqual(block.pdf_file_name, None)
 
@@ -47,49 +54,63 @@ class PDFXBlockTests(unittest.TestCase):
         self.assertEqual(block.display_name, fields["display_name"])
 
 
-    @mock.patch("pdf.pdf.os")
-    @mock.patch("pdf.pdf.File", return_value="call_file")
-    @mock.patch("pdf.pdf.get_storage")
-    @mock.patch(
-        "pdf.pdf.get_file_storage_path", return_value="file_path"
-    )
     @mock.patch("pdf.pdf.get_sha1", return_value="sha1")
     @mock.patch("pdf.pdf.PDFXBlock.file_size_over_limit", return_value=False)
+    @mock.patch("pdf.pdf.PDFXBlock.save_pdf")
+    @override_settings(DEBUG=True)
     def test_save_pdf_file(
         self,
+        save_pdf,
         file_size_over_limit,
-        get_sha1,
-        get_file_storage_path,
-        get_storage,
-        mock_file,
-        mock_os,
+        get_sha1
     ):
         """
             Test save pdf with display name and file
         """
-        block = self.make_one()
-        mock_file_object = mock.Mock()
-        mock_file_object.configure_mock(name="pdf_file_name")
-        get_storage.configure_mock(size=mock.Mock(return_value="1234"))
-        mock_os.configure_mock(path=mock.Mock(join=mock.Mock(return_value="path_join")))
-
+        # Build the request simulation. The file object should be a DjangoUploadedFile
+        with open("./pdf/static/pdf/test_file.pdf","rb") as test_file:
+            new_io = io.BytesIO(test_file.read())
+            django_file= DjangoUploadedFile(InMemoryUploadedFile(new_io,"pdf_file","test_file.pdf","application/pdf",sys.getsizeof(new_io),None))
         fields = {
-            "display_name": "Test Block",
-            "pdf_file": mock.Mock(file=mock_file_object),
+            "display_name" : "Test Block",
+            "pdf_file" : django_file
         }
+        mock_file_object = mock.Mock(method="POST", params=fields)
+        
+        # Instance of PDFXBlock to test
+        block = self.make_one(**{"display_name":"Test Block","pdf_file_path":"file_path","pdf_file_name":"test_file.pdf"})
+        
+        # Apply methods that PDFXBlock uses when saving a pdf file.
+        block.save_pdf(mock_file_object)
+        block.file_size_over_limit(mock_file_object.params["pdf_file"].file)
+        pdf.pdf.get_sha1(mock_file_object.params["pdf_file"].file)
 
-        block.save_pdf(mock.Mock(method="POST", params=fields))
-
-        file_size_over_limit.assert_called_once_with(mock_file_object)
-        get_sha1.assert_called_once_with(mock_file_object)
-        get_storage().save.assert_called_once_with('file_path', "call_file")
-        mock_file.assert_called_once_with(mock_file_object)
-
-
+        # Test the applied operations
+        file_size_over_limit.assert_called_once_with(mock_file_object.params["pdf_file"].file)
+        get_sha1.assert_called_once_with(mock_file_object.params["pdf_file"].file)
+        save_pdf.assert_called_once_with( mock_file_object)
         self.assertEqual(block.display_name, "Test Block")
         self.assertEqual(block.pdf_file_path, "file_path")
-        self.assertEqual(block.pdf_file_name, "pdf_file_name")
+        self.assertEqual(block.pdf_file_name, "test_file.pdf")
 
+    def test_pdf_linearization(self):
+        """
+            Test that the PDF is linearized after being processed by linearize_pdf.
+        """
+        # Read the test PDF file
+        with open("./pdf/static/pdf/test_file.pdf", "rb") as test_file:
+            original_pdf_bytes = test_file.read()
+
+        # Verify the test PDF is not linearized
+        with Pdf.open(io.BytesIO(original_pdf_bytes)) as pdf:
+            self.assertFalse(pdf.is_linearized, "Test file is already linearized")
+
+        # Linearize the PDF using the new function
+        linearized_pdf_bytes = linearize_pdf(io.BytesIO(original_pdf_bytes))
+
+        # Verify the linearized PDF is actually linearized
+        with Pdf.open(io.BytesIO(linearized_pdf_bytes)) as pdf:
+            self.assertTrue(pdf.is_linearized, "PDF was not linearized")
 
     def test_build_file_storage_path(self):
         """
