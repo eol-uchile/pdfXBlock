@@ -5,35 +5,17 @@
     display: inline-block;
     vertical-align: top;
 }
-.pdf-download-button a {
-    transition: all 0.25s ease-in-out 0s;
-    font-size: 14px;
-    line-height: 14px;
-    float: left;
-    border-radius: 3px;
-    padding: 15px;
-    background-color: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
-    color: white !important;
-}
-.pdf-download-button a:hover, .pdf-download-button a:focus {
-    background-color: var(--primary-color-hover) !important;
-    border-color: var(--primary-color-hover) !important;
-}
 .pdf_block .embed-cover {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    
-    /* Just for demonstration, remove this part */
     opacity: 0.25;
     width: calc(100% - 17px);
-  }
+}
   
 .pdf_block .wrapper {
     position: relative;
     overflow: hidden;
-  }
-  
+}
