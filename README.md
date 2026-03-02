@@ -1,7 +1,9 @@
 pdfXBlock
 =========
 
-![https://github.com/eol-uchile/pdfXBlock/actions](https://github.com/eol-uchile/pdfXBlock/workflows/Python%20application/badge.svg)
+![Coverage Status](/coverage-badge.svg)
+
+![https://github.com/eol-uchile/pdfXBlock/actions](https://github.com/eol-uchile/pdfXBlock/workflows/Python%20application/badge.svg) 
 
 ### Description ###
 
