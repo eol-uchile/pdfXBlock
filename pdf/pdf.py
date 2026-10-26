@@ -119,7 +119,7 @@ class PDFXBlock(XBlock):
         context = {
             'display_name': self.display_name,
             'pdf_file_name': self.pdf_file_name,
-            'url': self.get_live_url(),
+            'url': get_storage().url(self.pdf_file_path) if self.pdf_file_path else '',
         }
         html = self.render_template('pdf_view.html', context)
         frag = Fragment(html)
@@ -179,5 +179,3 @@ class PDFXBlock(XBlock):
         return Response(
             json.dumps(response), content_type="application/json", charset="utf8"
         )
-
-
