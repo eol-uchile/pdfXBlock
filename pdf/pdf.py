@@ -17,7 +17,6 @@ from xblockutils.resources import ResourceLoader
 from xblock.exceptions import JsonHandlerError
 from webob import Response
 
-from django.urls import reverse
 from django.conf import settings
 from django.core.files import File
 from .utils import get_file_storage_path, get_sha1, get_storage, linearize_pdf
@@ -84,15 +83,6 @@ class PDFXBlock(XBlock):
         """
         return file_obj.size > self.upload_max_size()
 
-    def get_live_url(self):
-        """
-            Get the file url
-        """
-        if not self.pdf_file_path:
-            return ''
-        return reverse('eol/pdf:pdf_get_url', kwargs={'file_path': self.pdf_file_path})
-    
-
     def load_resource(self, resource_path):  # pylint: disable=no-self-use
         """
         Gets the content of a resource
@@ -119,7 +109,7 @@ class PDFXBlock(XBlock):
         context = {
             'display_name': self.display_name,
             'pdf_file_name': self.pdf_file_name,
-            'url': self.get_live_url(),
+            'url': get_storage().url(self.pdf_file_path) if self.pdf_file_path else '',
         }
         html = self.render_template('pdf_view.html', context)
         frag = Fragment(html)
@@ -179,5 +169,3 @@ class PDFXBlock(XBlock):
         return Response(
             json.dumps(response), content_type="application/json", charset="utf8"
         )
-
-
